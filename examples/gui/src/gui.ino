@@ -21,6 +21,14 @@ int graphId;
 int millisLabelId;
 int testSwitchId;
 
+
+/* */
+
+int pwm_A = D1;//Right side  D1
+int dir_A = D2;//Right reverse  D2
+int pwm_B = D3;//Right side  D3
+int dir_B = D4;//Right reverse  D4
+
 void numberCall(Control *sender, int type) { Serial.println(sender->value); }
 
 void textCall(Control *sender, int type) {
@@ -37,18 +45,50 @@ void slider(Control *sender, int type) {
   Serial.println(sender->value);
   // Like all Control Values in ESPUI slider values are Strings. To use them as int simply do this:
   int sliderValueWithOffset = sender->value.toInt() + 100;
-  Serial.print("SliderValue with offset");
+  Serial.print("SliderValue with offset ");
   Serial.println(sliderValueWithOffset);
+  int pwmFromSlider = sender->value.toInt();
+
+    if (sender->id == 8 )
+    {
+      if (pwmFromSlider > 0 )
+      {
+        analogWrite(pwm_A, pwmFromSlider); 
+        analogWrite(dir_A, HIGH );  
+      } else
+      {
+        digitalWrite(pwm_A, LOW); 
+        digitalWrite(dir_A, LOW ); 
+      }
+    }
+    else if (sender->id == 11 )
+    {
+      if (pwmFromSlider > 0 )
+      {
+        analogWrite(pwm_B, pwmFromSlider); 
+        analogWrite(dir_B, HIGH );  
+      } else
+      {
+        digitalWrite(pwm_B, LOW); 
+        digitalWrite(dir_B, LOW ); 
+      }
+    }
+
+
+  
+  
+ 
+
 }
 
 void buttonCallback(Control *sender, int type) {
   switch (type) {
   case B_DOWN:
-    Serial.println("Button DOWN");
+    Serial.println("Button DOWN ");
     break;
 
   case B_UP:
-    Serial.println("Button UP");
+    Serial.println("Button UP ");
     break;
   }
 }
@@ -201,8 +241,8 @@ void setup(void) {
   ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
   testSwitchId = ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
   ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
-  ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 30);
-  ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
+  ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 0);
+  ESPUI.slider("Slider two", &slider, ControlColor::Turquoise, 0);
   ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
   ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
 
