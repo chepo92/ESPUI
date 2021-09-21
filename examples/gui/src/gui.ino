@@ -19,15 +19,29 @@ const char *hostname = "espui";
 int statusLabelId;
 int graphId;
 int millisLabelId;
-int testSwitchId;
+// int testSwitchId;
+int sliderId [3];
+
+/* DC motor control L298 */
+
+  byte L298_pwm_A = D1;//Right side  D1
+  byte L298_dir_A = D2;//Right reverse  D2
+  byte L298_pwm_B = D3;//Right side  D3
+  byte L298_dir_B = D4;//Right reverse  D4
 
 
-/* */
+/* Stepper motor control ULN-2003 (4 pins control) */
+  #include <Stepper.h>
+  const int stepsPerRevolution = 200;  // change this to fit the number of steps per revolution for your motor
+  // Pin definition
+  byte stepper_A = D5;//Right side  D1
+  byte stepper_B = D6;//Right reverse  D2
+  byte stepper_C = D7;//Right side  D3
+  byte stepper_D = D8;//Right reverse  D4
+  // initialize the stepper library on pins 8 through 11:
+  Stepper myStepper(stepsPerRevolution, stepper_A, stepper_B, stepper_C, stepper_D);
 
-int pwm_A = D1;//Right side  D1
-int dir_A = D2;//Right reverse  D2
-int pwm_B = D3;//Right side  D3
-int dir_B = D4;//Right reverse  D4
+
 
 void numberCall(Control *sender, int type) { Serial.println(sender->value); }
 
@@ -44,40 +58,36 @@ void slider(Control *sender, int type) {
   Serial.print(", Value: ");
   Serial.println(sender->value);
   // Like all Control Values in ESPUI slider values are Strings. To use them as int simply do this:
-  int sliderValueWithOffset = sender->value.toInt() + 100;
-  Serial.print("SliderValue with offset ");
-  Serial.println(sliderValueWithOffset);
   int pwmFromSlider = sender->value.toInt();
 
-    if (sender->id == 8 )
+    if (sender->id == sliderId[0] ) // 1st motor 
     {
       if (pwmFromSlider > 0 )
       {
-        analogWrite(pwm_A, pwmFromSlider); 
-        analogWrite(dir_A, HIGH );  
+        analogWrite(L298_pwm_A, pwmFromSlider); 
+        analogWrite(L298_dir_A, HIGH );  
       } else
       {
-        digitalWrite(pwm_A, LOW); 
-        digitalWrite(dir_A, LOW ); 
+        digitalWrite(L298_pwm_A, LOW); 
+        digitalWrite(L298_dir_A, LOW ); 
       }
     }
-    else if (sender->id == 11 )
+    else if (sender->id == sliderId[1] ) // 2nd motor 
     {
       if (pwmFromSlider > 0 )
       {
-        analogWrite(pwm_B, pwmFromSlider); 
-        analogWrite(dir_B, HIGH );  
+        analogWrite(L298_pwm_B, pwmFromSlider); 
+        analogWrite(L298_dir_B, HIGH );  
       } else
       {
-        digitalWrite(pwm_B, LOW); 
-        digitalWrite(dir_B, LOW ); 
+        digitalWrite(L298_pwm_B, LOW); 
+        digitalWrite(L298_dir_B, LOW ); 
       }
     }
-
-
-  
-  
- 
+    else if (sender->id == sliderId[2] ) // 3rd motor 
+    {
+        myStepper.setSpeed(pwmFromSlider); // set the speed
+    }    
 
 }
 
@@ -175,13 +185,16 @@ void otherSwitchExample(Control *sender, int value) {
     break;
 
   case S_INACTIVE:
-    Serial.print("Inactive");
+    Serial.print("Inactive: ");
     break;
   }
 
   Serial.print(" ");
   Serial.println(sender->id);
 }
+
+
+/* Setup function */
 
 void setup(void) {
   ESPUI.setVerbosity(Verbosity::VerboseJSON);
@@ -239,10 +252,11 @@ void setup(void) {
   ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press");
   ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
   ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
-  testSwitchId = ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
+  ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
   ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
-  ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 0);
-  ESPUI.slider("Slider two", &slider, ControlColor::Turquoise, 0);
+  sliderId[0] = ESPUI.slider("Motor one", &slider, ControlColor::Alizarin, 0);
+  sliderId[1] = ESPUI.slider("Motor two", &slider, ControlColor::Turquoise, 0);
+  sliderId[2] = ESPUI.slider("Motor three", &slider, ControlColor::Emerald, 0);
   ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
   ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
 
@@ -273,16 +287,20 @@ void loop(void) {
   dnsServer.processNextRequest();
 
   static long oldTime = 0;
-  static bool testSwitchState = false;
+  // static bool testSwitchState = false;
 
   if (millis() - oldTime > 5000) {
     ESPUI.print(millisLabelId, String(millis()));
 
     ESPUI.addGraphPoint(graphId, random(1, 50));
 
-    testSwitchState = !testSwitchState;
-    ESPUI.updateSwitcher(testSwitchId, testSwitchState);
+    // testSwitchState = !testSwitchState;
+    // ESPUI.updateSwitcher(testSwitchId, testSwitchState);
     
     oldTime = millis();
   }
+
+  // run the stepper, blocking function, step 1/100 of a revolution 
+  myStepper.step(stepsPerRevolution / 100);
+
 }
