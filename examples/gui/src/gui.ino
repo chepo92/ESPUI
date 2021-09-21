@@ -166,11 +166,11 @@ void padExample(Control *sender, int value) {
 void switchExample(Control *sender, int value) {
   switch (value) {
   case S_ACTIVE:
-    Serial.print("Active:");
+    Serial.print("Active: ");
     break;
 
   case S_INACTIVE:
-    Serial.print("Inactive");
+    Serial.print("Inactive ");
     break;
   }
 
@@ -181,7 +181,7 @@ void switchExample(Control *sender, int value) {
 void otherSwitchExample(Control *sender, int value) {
   switch (value) {
   case S_ACTIVE:
-    Serial.print("Active:");
+    Serial.print("Active: ");
     break;
 
   case S_INACTIVE:
@@ -247,20 +247,21 @@ void setup(void) {
   Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
 
   statusLabelId = ESPUI.label("Status:", ControlColor::Turquoise, "Stop");
-  millisLabelId = ESPUI.label("Millis:", ControlColor::Emerald, "0");
-  ESPUI.button("Push Button", &buttonCallback, ControlColor::Peterriver, "Press");
-  ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press");
-  ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
-  ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
+  // millisLabelId = ESPUI.label("Millis:", ControlColor::Emerald, "0");
+  // ESPUI.button("Push Button", &buttonCallback, ControlColor::Peterriver, "Press");
+  // ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press");
+  // ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
+  // ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
   ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
   ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
+  ESPUI.switcher("Switch 3", &otherSwitchExample, ControlColor::None, true);
   sliderId[0] = ESPUI.slider("Motor one", &slider, ControlColor::Alizarin, 0);
   sliderId[1] = ESPUI.slider("Motor two", &slider, ControlColor::Turquoise, 0);
   sliderId[2] = ESPUI.slider("Motor three", &slider, ControlColor::Emerald, 0);
-  ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
-  ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
+  // ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
+  // ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
 
-  graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
+  // graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
 
   /*
    * .begin loads and serves all files from PROGMEM directly.
