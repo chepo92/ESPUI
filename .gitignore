@@ -36,3 +36,4 @@ Temporary Items
 
 
 .vscode/
+examples/gui/src/secrets.h
