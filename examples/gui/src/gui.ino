@@ -11,12 +11,13 @@ DNSServer dnsServer;
 #include <ESP8266WiFi.h>
 #endif
 
-const char *ssid = "ESPUI";
-const char *password = "espui";
+#include "secrets.h"
+
+const char *fallback_ssid = "ESPUI";
 
 const char *hostname = "espui";
 
-int statusLabelId;
+// int statusLabelId;
 int graphId;
 int millisLabelId;
 // int testSwitchId;
@@ -107,12 +108,12 @@ void buttonExample(Control *sender, int type) {
   switch (type) {
   case B_DOWN:
     Serial.println("Status: Start");
-    ESPUI.print(statusLabelId, "Start");
+    // ESPUI.print(statusLabelId, "Start");
     break;
 
   case B_UP:
     Serial.println("Status: Stop");
-    ESPUI.print(statusLabelId, "Stop");
+    // ESPUI.print(statusLabelId, "Stop");
     break;
   }
 }
@@ -211,9 +212,9 @@ void setup(void) {
   Serial.print("\n\nTry to connect to existing network");
 
   {
-    uint8_t timeout = 10;
+    uint8_t timeout = 30;
 
-    // Wait for connection, 5s timeout
+    // Wait for connection,
     do {
       delay(500);
       Serial.print(".");
@@ -226,7 +227,7 @@ void setup(void) {
 
       WiFi.mode(WIFI_AP);
       WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-      WiFi.softAP(ssid);
+      WiFi.softAP(fallback_ssid);
 
       timeout = 5;
 
@@ -246,17 +247,17 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
 
-  statusLabelId = ESPUI.label("Status:", ControlColor::Turquoise, "Stop");
+  // statusLabelId = ESPUI.label("Status:", ControlColor::Turquoise, "Stop");
   // millisLabelId = ESPUI.label("Millis:", ControlColor::Emerald, "0");
   // ESPUI.button("Push Button", &buttonCallback, ControlColor::Peterriver, "Press");
   // ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press");
   // ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
   // ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
-  ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
-  ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
-  ESPUI.switcher("Switch 3", &otherSwitchExample, ControlColor::None, true);
+  ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, true);
   sliderId[0] = ESPUI.slider("Motor one", &slider, ControlColor::Alizarin, 0);
+  ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
   sliderId[1] = ESPUI.slider("Motor two", &slider, ControlColor::Turquoise, 0);
+  ESPUI.switcher("Switch 3", &otherSwitchExample, ControlColor::None, true);
   sliderId[2] = ESPUI.slider("Motor three", &slider, ControlColor::Emerald, 0);
   // ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
   // ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
@@ -287,19 +288,19 @@ void setup(void) {
 void loop(void) {
   dnsServer.processNextRequest();
 
-  static long oldTime = 0;
+  // static long oldTime = 0;
   // static bool testSwitchState = false;
 
-  if (millis() - oldTime > 5000) {
-    ESPUI.print(millisLabelId, String(millis()));
+  // if (millis() - oldTime > 5000) {
+  //   // ESPUI.print(millisLabelId, String(millis()));
 
-    ESPUI.addGraphPoint(graphId, random(1, 50));
+  //   // ESPUI.addGraphPoint(graphId, random(1, 50));
 
-    // testSwitchState = !testSwitchState;
-    // ESPUI.updateSwitcher(testSwitchId, testSwitchState);
+  //   // testSwitchState = !testSwitchState;
+  //   // ESPUI.updateSwitcher(testSwitchId, testSwitchState);
     
-    oldTime = millis();
-  }
+  //   oldTime = millis();
+  // }
 
   // run the stepper, blocking function, step 1/100 of a revolution 
   myStepper.step(stepsPerRevolution / 100);
