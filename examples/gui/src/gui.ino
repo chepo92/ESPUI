@@ -60,7 +60,7 @@ void slider(Control *sender, int type) {
   Serial.println(sender->value);
   // Like all Control Values in ESPUI slider values are Strings. To use them as int simply do this:
   int pwmFromSlider = sender->value.toInt();
-
+  pwmFromSlider = pwmFromSlider*40;
     if (sender->id == sliderId[0] ) // 1st motor 
     {
       if (pwmFromSlider > 0 )
